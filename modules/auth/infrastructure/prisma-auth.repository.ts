@@ -101,7 +101,7 @@ export class PrismaAuthRepository implements AuthRepository {
       const { tokenDetails } = request;
 
       if (tokenDetails && typeof tokenDetails !== "string") {
-        const payload = { id: tokenDetails.id, email: tokenDetails.email };
+        const payload = { id: tokenDetails.id, name: tokenDetails.name, email: tokenDetails.email };
         const accessToken = jwt.sign(
           payload,
           env.ACCESS_TOKEN_SECRET as string,
@@ -122,9 +122,9 @@ export class PrismaAuthRepository implements AuthRepository {
 
   async verifyToken(token: string): Promise<UserEntity> {
     try {
-      const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as { id: string; email: string };
+      const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as { id: string; name: string; email: string };
 
-      const user = await prisma.user.findUnique({ where: { id: decoded.id, email: decoded.email } });
+      const user = await prisma.user.findUnique({ where: { id: decoded.id, name: decoded.name, email: decoded.email } });
 
       if (!user) {
         throw new AppError(401, "Token is invalid or user does not exist");

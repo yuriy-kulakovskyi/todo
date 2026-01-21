@@ -5,7 +5,7 @@ import prisma from "prisma/prisma.service";
 
 export const generateTokens = async (user: UserEntity): Promise< { accessToken: string, refreshToken: string } > => {
   try {
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: user.id, name: user.name, email: user.email };
     const accessToken = jwt.sign(
       payload,
       env.ACCESS_TOKEN_SECRET,

@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 
 export interface ITokenDetails {
   id: string;
+  name: string;
   email: string;
 }
 
