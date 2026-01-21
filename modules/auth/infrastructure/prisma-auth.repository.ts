@@ -10,6 +10,7 @@ import { AppError } from "@shared/errors/app.error";
 import prisma from "prisma/prisma.service";
 import { env } from "@config/env";
 import { generateTokens } from "@shared/utils/tokens/generate-tokens.util";
+import { verifyRefreshToken } from "@shared/utils/tokens/verify-refresh-token.util";
 
 export class PrismaAuthRepository implements AuthRepository {
   async signUp(signup: ISignUp): Promise<IUserResponse> {
@@ -47,12 +48,12 @@ export class PrismaAuthRepository implements AuthRepository {
         refreshToken
       }
 
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AppError) {
         throw error; 
       }
 
-      throw new AppError(500, "Error during user sign up");
+      throw new AppError(500, error.message);
     }
   }
 
@@ -85,12 +86,37 @@ export class PrismaAuthRepository implements AuthRepository {
         accessToken,
         refreshToken
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AppError) {
         throw error; 
       }
 
-      throw new AppError(500, "Error during user sign in");
+      throw new AppError(500, error.message);
+    }
+  }
+
+  async getAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const request = await verifyRefreshToken(refreshToken);
+      const { tokenDetails } = request;
+
+      if (tokenDetails && typeof tokenDetails !== "string") {
+        const payload = { id: tokenDetails.id, email: tokenDetails.email };
+        const accessToken = jwt.sign(
+          payload,
+          env.ACCESS_TOKEN_SECRET as string,
+          { expiresIn: '15m' }
+        );
+        return accessToken;
+      } else {
+        throw new AppError(401, "Invalid refresh token details");
+      }
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        throw error; 
+      }
+
+      throw new AppError(500, error.message);
     }
   }
 
@@ -105,12 +131,12 @@ export class PrismaAuthRepository implements AuthRepository {
       }
 
       return new UserEntity(user.id, user.email, user.name);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof AppError) {
         throw error; 
       }
 
-      throw new AppError(500, "Error during token verification");
+      throw new AppError(500, error.message);
     }
   }
 }

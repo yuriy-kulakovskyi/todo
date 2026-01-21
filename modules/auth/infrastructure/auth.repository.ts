@@ -6,5 +6,6 @@ import { IUserResponse } from "@modules/auth/domain/interfaces/user-response.int
 export interface AuthRepository {
   signUp(signup: ISignUp): Promise<IUserResponse>;
   signIn(signin: ISignIn): Promise<IUserResponse>;
+  getAccessToken(refreshToken: string): Promise<string>;
   verifyToken(token: string): Promise<UserEntity>;
 }

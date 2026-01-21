@@ -1,3 +1,6 @@
+import 'reflect-metadata';
+import '@config/di/auth.di'; 
+
 import { NextFunction, Request, Response } from "express";
 import { authRouter } from "@modules/auth/router/auth.router";
 import { app } from "./app";
