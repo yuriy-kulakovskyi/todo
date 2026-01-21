@@ -1,0 +1,33 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String      @id @default(uuid())
+  email      String      @unique
+  password   String
+  name       String
+  todos      Todo[]
+  userTokens UserToken[]
+}
+
+model Todo {
+  id        String  @id @default(uuid())
+  title     String
+  completed Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model UserToken {
+  userId    String   @id
+  token     String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
