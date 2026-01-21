@@ -1,14 +1,20 @@
 import { container } from "tsyringe";
 import express from "express";
 import { AuthController } from "@modules/auth/controllers/auth.controller";
+import { validateInput } from "@shared/middlewares/validate-input.middleware";
+import { SignupDto } from "@shared/dto/auth/signup.dto";
+import { SigninDto } from "@shared/dto/auth/signin.dto";
+import { GetAccessTokenDto } from "@shared/dto/auth/get-access-token.dto";
+import { VerifyTokenDto } from "@shared/dto/auth/verify-token.dto";
 
 const router = express.Router();
 
 const accountController = container.resolve(AuthController);
 
-router.post("/signup", async (req, res, next) => {
+router.post("/signup", validateInput(SignupDto), async (req, res, next) => {
   try {
-    const userResponse = await accountController.signUp({email: req.body.email, password: req.body.password, name: req.body.name});
+    const { email, password, name } = req.body;
+    const userResponse = await accountController.signUp({email, password, name});
 
     res.status(201).json(userResponse);
   } catch (error) {
@@ -16,9 +22,10 @@ router.post("/signup", async (req, res, next) => {
   }
 });
 
-router.post("/signin", async (req, res, next) => {
+router.post("/signin", validateInput(SigninDto), async (req, res, next) => {
   try {
-    const userResponse = await accountController.signIn({email: req.body.email, password: req.body.password});
+    const { email, password } = req.body;
+    const userResponse = await accountController.signIn({email, password});
 
     res.status(200).json(userResponse);
   } catch (error) {
@@ -26,9 +33,10 @@ router.post("/signin", async (req, res, next) => {
   }
 });
 
-router.post("/access-token", async (req, res, next) => {
+router.post("/access-token", validateInput(GetAccessTokenDto), async (req, res, next) => {
   try {
-    const accessToken = await accountController.getAccessToken(req.body.refreshToken);
+    const { refreshToken } = req.body;
+    const accessToken = await accountController.getAccessToken(refreshToken);
 
     res.status(200).json({
       error: false,
@@ -40,9 +48,12 @@ router.post("/access-token", async (req, res, next) => {
   }
 });
 
-router.get("/verify-token", async (req, res, next) => {
+router.get("/verify-token", validateInput(VerifyTokenDto), async (req, res, next) => {
   try {
-    const user = await accountController.verifyToken(req.headers.authorization as string);
+    const { authorization } = req.headers;
+    console.log(authorization);
+    
+    const user = await accountController.verifyToken(authorization as string);
 
     res.status(200).json({
       error: false,

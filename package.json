@@ -28,7 +28,8 @@
     "reflect-metadata": "^0.2.2",
     "tsconfig-paths": "^4.2.0",
     "tsyringe": "^4.10.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
