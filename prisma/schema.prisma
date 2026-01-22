@@ -23,6 +23,7 @@ model Todo {
   completed Boolean @default(false)
   user      User    @relation(fields: [userId], references: [id])
   userId    String
+  isDeleted Boolean @default(false)
 }
 
 model UserToken {

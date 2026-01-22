@@ -9,7 +9,7 @@ export const generateTokens = async (user: UserEntity): Promise< { accessToken: 
     const accessToken = jwt.sign(
       payload,
       env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '30m' }
     );
 
     const refreshToken = jwt.sign(

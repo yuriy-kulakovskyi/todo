@@ -105,7 +105,7 @@ export class PrismaAuthRepository implements AuthRepository {
         const accessToken = jwt.sign(
           payload,
           env.ACCESS_TOKEN_SECRET as string,
-          { expiresIn: '15m' }
+          { expiresIn: '30m' }
         );
         return accessToken;
       } else {
