@@ -25,12 +25,12 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET as string) as unknown;
 
   if (!decoded || typeof decoded !== 'object') {
-    throw new AppError(401, "Invalid token payload");
+    return next(new AppError(401, "Invalid token payload"));
   }
 
   const payload = decoded as DecodedTokenPayload;
   if (!payload.id || !payload.email || !payload.name) {
-    throw new AppError(401, "Invalid token payload");
+    return next(new AppError(401, "Invalid token payload"));
   }
 
   (req as RequestWithUser).user = payload;

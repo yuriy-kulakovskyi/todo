@@ -11,9 +11,11 @@ import { allExceptionsFilter } from "@shared/filters/all-exceptions.filter";
 import { logger } from "@shared/utils/logger/logger";
 import bodyParser from "body-parser";
 import { loggerMiddleware } from '@shared/middlewares/logger.middleware';
+import { rateLimiter } from '@shared/middlewares/rate-limiter.middleware';
 
 app.use(bodyParser.json());
 
+app.use(rateLimiter);
 app.use(loggerMiddleware);
 
 app.use("/todo", todoRouter);
