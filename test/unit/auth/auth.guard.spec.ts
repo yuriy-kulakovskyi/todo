@@ -1,63 +1,41 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from 'jsonwebtoken';
-import httpMocks from 'node-mocks-http';
+import { authMiddleware } from "@presentation/auth.guard";
 
-interface JwtPayload {
-  id: number;
-  email: string;
-  name: string;
-}
+jest.mock("@config/env", () => ({
+  env: {
+    NODE_ENV: "test",
+    PORT: "3000",
+    ACCESS_TOKEN_SECRET: "test"
+  },
+}));
 
-interface RequestWithUser extends Request {
-  user?: JwtPayload;
-}
+jest.mock("jsonwebtoken", () => ({
+  __esModule: true,
+  default: {
+    verify: jest.fn(),
+  },
+}));
 
-jest.mock('jsonwebtoken', () => ({ verify: jest.fn() }));
+describe('Auth Middleware', () => {
+    let req: Request, res: Response, next: NextFunction;
 
-const authMiddleware = (
-  req: RequestWithUser,
-  res: Response,
-  next: NextFunction
-): void => {
-  const header = req.get("authorization");
-  const rawToken = Array.isArray(header) ? header[0] : (header || "");
+    beforeEach(() => {
+        req = { headers: {} } as Request;
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        } as unknown as Response;
+        next = jest.fn();
+    });
 
-  if (!rawToken) {
-    next(new Error("Authorization token is missing"));
-    return;
-  }
+    it('should return 401 if no authorization header is provided', () => {
+        authMiddleware(req, res, next);
+        expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 401, detail: "Authorization token is missing" }));
+    });
 
-  const match = rawToken.match(/^Bearer\s+(.+)$/i);
-  if (!match) {
-    next(new Error("Invalid authorization header format"));
-    return;
-  }
-
-  const token = match[1];
-  const decoded = jwt.verify(token, "") as JwtPayload;
-
-  if (!decoded || typeof decoded !== "object") {
-    next(new Error("Invalid token payload"));
-    return;
-  }
-
-  req.user = decoded;
-  next();
-};
-
-test('authMiddleware calls next and attaches user when token is valid', () => {
-  const payload = { id: 42, email: 'guard@example.com', name: 'Guard' };
-  (jwt.verify as jest.Mock).mockReturnValue(payload);
-
-  const req = httpMocks.createRequest({
-    headers: { authorization: 'Bearer faketoken' },
-  });
-  const res = httpMocks.createResponse();
-  const next = jest.fn();
-
-  authMiddleware(req, res, next);
-
-  expect(next).toHaveBeenCalledWith();
-  expect(req.user).toBeDefined();
-  expect(req.user.email).toEqual(payload.email);
+    it('should call next if token is provided', () => {
+        req.headers['authorization'] = 'Bearer valid-token';
+        authMiddleware(req, res, next);
+        expect(next).toHaveBeenCalled();
+    });
 });

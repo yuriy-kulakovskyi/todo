@@ -8,4 +8,9 @@ export default {
   transform: {
     ...tsJestTransformCfg,
   },
+  moduleNameMapper: {
+    "^@presentation/(.*)$": "<rootDir>/presentation/$1",
+    "^@shared/(.*)$": "<rootDir>/shared/$1",
+    "^@config/(.*)$": "<rootDir>/config/$1",
+  },
 };

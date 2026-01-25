@@ -13,7 +13,8 @@
       "@src/*": ["src/*"],
       "@config/*": ["config/*"],
       "@presentation/*": ["presentation/*"],
-      "@infrastructure/*": ["infrastructure/*"]
+      "@infrastructure/*": ["infrastructure/*"],
+      "@tests/*": ["test/*"]
     },
     "strict": true,
     "esModuleInterop": true,

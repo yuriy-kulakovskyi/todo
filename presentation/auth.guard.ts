@@ -7,9 +7,9 @@ import { DecodedTokenPayload, RequestWithUser } from "@shared/interfaces/decoded
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
-  const rawToken = Array.isArray(header) ? header[0] : (header || "")
+  const rawToken = Array.isArray(header) ? header[0] : (header || "");
 
-  if (!rawToken) {
+  if (!rawToken || !header) {
     logger.error(`Auth middleware missing authorization header`)
     return next(new AppError(401, "Authorization token is missing"))
   }
